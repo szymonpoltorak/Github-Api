@@ -21,8 +21,6 @@
         <maven.compiler.release>17</maven.compiler.release>
         <java.version>17</java.version>
         <logback.version>1.4.5</logback.version>
-        <jwt.ver>0.11.5</jwt.ver>
-        <swagger.ver>2.1.0</swagger.ver>
     </properties>
 
     <dependencies>
