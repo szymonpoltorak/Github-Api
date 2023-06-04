@@ -17,7 +17,7 @@ http://localhost:8080/api/github/repositories?username={username}
 ```json
 {
   "status": 406,
-  "message": "Application/xml header is not supported!"
+  "Message": "Application/xml header is not supported!"
 }
 ```
 
@@ -26,7 +26,7 @@ http://localhost:8080/api/github/repositories?username={username}
 ```json
 {
   "status": 404,
-  "message": "User does not exist"
+  "Message": "User does not exist"
 }
 ```
 
