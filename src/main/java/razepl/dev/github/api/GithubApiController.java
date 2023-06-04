@@ -3,7 +3,6 @@ package razepl.dev.github.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
 import razepl.dev.github.api.interfaces.GithubControllerInterface;
 import razepl.dev.github.api.interfaces.GithubServiceInterface;
@@ -28,15 +27,11 @@ public class GithubApiController implements GithubControllerInterface {
     @GetMapping(value = GET_REPOSITORIES_MAPPING)
     public final ResponseEntity<List<GitRepository>> getUsersRepositories(@RequestParam String username,
                                                                           @RequestHeader(ACCEPT) String acceptHeader) {
-        try {
-            if (acceptHeader.equals(ACCEPT_XML)) {
-                throw new HttpMediaTypeNotAcceptableException("Application/xml header is not supported!");
-            }
-            log.info("Received request to get repositories for user: {}", username);
-
-            return ResponseEntity.ok(githubService.getUsersRepositories(username));
-        } catch (HttpMediaTypeNotAcceptableException exception) {
-            throw new XmlHeaderException(exception.getMessage());
+        if (acceptHeader.equals(ACCEPT_XML)) {
+            throw new XmlHeaderException("Application/xml header is not supported!");
         }
+        log.info("Received request to get repositories for user: {}", username);
+
+        return ResponseEntity.ok(githubService.getUsersRepositories(username));
     }
 }
