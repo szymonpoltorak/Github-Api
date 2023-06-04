@@ -7,13 +7,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import razepl.dev.github.api.interfaces.GithubExceptionHandlerInterface;
 import razepl.dev.github.data.ExceptionResponse;
 import razepl.dev.github.exceptions.UserDoesNotExistException;
 import razepl.dev.github.exceptions.XmlHeaderException;
 
 @Slf4j
 @ControllerAdvice
-public class GithubExceptionHandler {
+public class GithubExceptionHandler implements GithubExceptionHandlerInterface {
+    @Override
     @ExceptionHandler(UserDoesNotExistException.class)
     public final ResponseEntity<ExceptionResponse> handleUserDoesNotExistException(UserDoesNotExistException exception) {
         ExceptionResponse exceptionResponse = ExceptionResponse
@@ -27,6 +29,7 @@ public class GithubExceptionHandler {
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
     }
 
+    @Override
     @ExceptionHandler(XmlHeaderException.class)
     public final ResponseEntity<ExceptionResponse> handleXmlHeaderException(XmlHeaderException exception) {
         ExceptionResponse exceptionResponse = ExceptionResponse

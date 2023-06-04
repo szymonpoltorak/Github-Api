@@ -39,8 +39,12 @@ public class GithubService implements GithubServiceInterface {
         GithubRepoDto[] githubRepos = restTemplate.getForObject(url, GithubRepoDto[].class);
 
         if (githubRepos == null) {
+            log.info("User {} does not have any repositories", username);
+
             return Collections.emptyList();
         }
+        log.info("User {} has {} repositories", username, githubRepos.length);
+
         return Arrays.stream(githubRepos)
                 .filter(repo -> !repo.fork())
                 .map(repo -> GitRepository.builder()
