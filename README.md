@@ -41,7 +41,7 @@ http://localhost:8080/api/github/repositories?username={username}
       "branches": [
         {
           "branchName": "branchName",
-            "lastCommitSha": "lastCommitSha"
+          "lastCommitSha": "lastCommitSha"
         }
       ]
     }
