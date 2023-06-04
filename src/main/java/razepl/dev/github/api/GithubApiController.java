@@ -13,14 +13,17 @@ import razepl.dev.github.data.GitRepository;
 
 import java.util.List;
 
+import static razepl.dev.github.constants.ApiMappings.GET_REPOSITORIES_MAPPING;
+import static razepl.dev.github.constants.ApiMappings.GITHUB_API_MAPPING;
+
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/github")
+@RequestMapping(value = GITHUB_API_MAPPING)
 @RequiredArgsConstructor
 public class GithubApiController implements GithubControllerInterface {
     private final GithubServiceInterface githubService;
 
-    @GetMapping(value = "/repositories")
+    @GetMapping(value = GET_REPOSITORIES_MAPPING)
     public final ResponseEntity<List<GitRepository>> getUsersRepositories(@RequestParam String username) {
         log.info("Received request to get repositories for user: {}", username);
 
