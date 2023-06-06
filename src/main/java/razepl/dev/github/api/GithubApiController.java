@@ -23,7 +23,7 @@ public class GithubApiController implements GithubControllerInterface {
     @Override
     @GetMapping(value = GET_REPOSITORIES_MAPPING)
     public final List<GitRepository> getUsersRepositories(@RequestParam String username,
-                                                                          @RequestHeader(ACCEPT) String acceptHeader) {
+                                                          @RequestHeader(ACCEPT) String acceptHeader) {
         log.info("Received request to get repositories for user: {}", username);
 
         return githubService.getUsersRepositories(username, acceptHeader);

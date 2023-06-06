@@ -48,21 +48,20 @@ public class GithubService implements GithubServiceInterface {
     }
 
     private List<GithubRepoDto> getReposList(String username) {
-        WebClient webClient = WebClient.create();
+        var webClient = WebClient.create();
         String userUrl = String.format(GITHUB_USER_URL_FORMAT, username);
         String url = String.format(GITHUB_REPO_URL_FORMAT, username);
 
-        var optionalUser = webClient.get().uri(userUrl)
-                .retrieve().toBodilessEntity().block();
+        webClient.get().uri(userUrl)
+                .retrieve().onStatus(HttpStatus.NOT_FOUND::equals, clientResponse -> {
+                    throw new UserDoesNotExistException("User does not exist");
+                }).bodyToMono(String.class).block();
 
-        if (optionalUser == null || optionalUser.getStatusCode() == HttpStatus.NOT_FOUND) {
-            throw new UserDoesNotExistException("User does not exist");
-        }
         return webClient.get().uri(url).retrieve().bodyToFlux(GithubRepoDto.class).collectList().block();
     }
 
     private List<GitBranch> findBranchesForRepo(String repoName, String username) {
-        WebClient webClient = WebClient.create();
+        var webClient = WebClient.create();
         String url = String.format(GITHUB_BRANCH_URL_FORMAT, username, repoName);
 
         var githubBranches = webClient.get().uri(url).retrieve()

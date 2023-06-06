@@ -36,7 +36,7 @@ public class GithubExceptionHandler implements GithubExceptionHandlerInterface {
                 .status(HttpStatus.NOT_ACCEPTABLE.value())
                 .Message(exception.getMessage())
                 .build();
-        HttpHeaders headers = new HttpHeaders();
+        var headers = new HttpHeaders();
 
         headers.setContentType(MediaType.APPLICATION_JSON);
 
