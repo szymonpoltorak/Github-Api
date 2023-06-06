@@ -1,68 +1,76 @@
 package razepl.dev.github.api;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import razepl.dev.github.api.interfaces.GithubServiceInterface;
-import razepl.dev.github.data.*;
+import razepl.dev.github.data.GitBranch;
+import razepl.dev.github.data.GitRepository;
+import razepl.dev.github.data.GithubBranchDto;
+import razepl.dev.github.data.GithubRepoDto;
 import razepl.dev.github.exceptions.UserDoesNotExistException;
+import razepl.dev.github.exceptions.XmlHeaderException;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static razepl.dev.github.constants.GithubApiFormats.*;
+import static razepl.dev.github.constants.HttpHeaders.ACCEPT_XML;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class GithubService implements GithubServiceInterface {
-    private final RestTemplateBuilder restTemplateBuilder;
-
     @Override
-    public final List<GitRepository> getUsersRepositories(String username) {
-        RestTemplate restTemplate = restTemplateBuilder.build();
-        String userUrl = String.format(GITHUB_USER_URL_FORMAT, username);
-        String url = String.format(GITHUB_REPO_URL_FORMAT, username);
-
-        try {
-            restTemplate.getForObject(userUrl, GithubUserDto.class);
-        } catch (RestClientResponseException exception) {
-            if (exception.getStatusCode() == HttpStatus.NOT_FOUND) {
-                throw new UserDoesNotExistException("User does not exist");
-            }
+    public final List<GitRepository> getUsersRepositories(String username, String acceptHeader) {
+        if (acceptHeader.equals(ACCEPT_XML)) {
+            throw new XmlHeaderException("Application/xml header is not supported!");
         }
-        GithubRepoDto[] githubRepos = restTemplate.getForObject(url, GithubRepoDto[].class);
+        var githubRepos = getReposList(username);
 
         if (githubRepos == null) {
             log.info("User {} does not have any repositories", username);
 
             return Collections.emptyList();
         }
-        log.info("User {} has {} repositories", username, githubRepos.length);
+        log.info("User {} has {} repositories", username, githubRepos.size());
 
-        return Arrays.stream(githubRepos)
+        return githubRepos
+                .stream()
                 .filter(repo -> !repo.fork())
                 .map(repo -> GitRepository.builder()
                         .repositoryName(repo.name())
                         .ownerLogin(repo.owner().login())
-                        .branches(findBranchesForRepo(repo.name(), username, restTemplate))
+                        .branches(findBranchesForRepo(repo.name(), username))
                         .build()
                 )
                 .toList();
     }
 
-    private List<GitBranch> findBranchesForRepo(String repoName, String username, RestTemplate restTemplate) {
+    private List<GithubRepoDto> getReposList(String username) {
+        WebClient webClient = WebClient.create();
+        String userUrl = String.format(GITHUB_USER_URL_FORMAT, username);
+        String url = String.format(GITHUB_REPO_URL_FORMAT, username);
+
+        var optionalUser = webClient.get().uri(userUrl)
+                .retrieve().toBodilessEntity().block();
+
+        if (optionalUser == null || optionalUser.getStatusCode() == HttpStatus.NOT_FOUND) {
+            throw new UserDoesNotExistException("User does not exist");
+        }
+        return webClient.get().uri(url).retrieve().bodyToFlux(GithubRepoDto.class).collectList().block();
+    }
+
+    private List<GitBranch> findBranchesForRepo(String repoName, String username) {
+        WebClient webClient = WebClient.create();
         String url = String.format(GITHUB_BRANCH_URL_FORMAT, username, repoName);
-        GithubBranchDto[] githubBranches = restTemplate.getForObject(url, GithubBranchDto[].class);
+
+        var githubBranches = webClient.get().uri(url).retrieve()
+                .bodyToFlux(GithubBranchDto.class).collectList().block();
 
         if (githubBranches == null) {
             return Collections.emptyList();
         }
-        return Arrays.stream(githubBranches).map(GithubBranchDto::toGitBranch).toList();
+        return githubBranches.stream().map(GithubBranchDto::toGitBranch).toList();
     }
 }

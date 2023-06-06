@@ -18,12 +18,11 @@ public class GithubExceptionHandler implements GithubExceptionHandlerInterface {
     @Override
     @ExceptionHandler(UserDoesNotExistException.class)
     public final ResponseEntity<ExceptionResponse> handleUserDoesNotExistException(UserDoesNotExistException exception) {
-        ExceptionResponse exceptionResponse = ExceptionResponse
+        var exceptionResponse = ExceptionResponse
                 .builder()
                 .status(HttpStatus.NOT_FOUND.value())
-                .message(exception.getMessage())
+                .Message(exception.getMessage())
                 .build();
-
         log.error("User does not exist: {}", exception.getMessage());
 
         return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
@@ -32,10 +31,10 @@ public class GithubExceptionHandler implements GithubExceptionHandlerInterface {
     @Override
     @ExceptionHandler(XmlHeaderException.class)
     public final ResponseEntity<ExceptionResponse> handleXmlHeaderException(XmlHeaderException exception) {
-        ExceptionResponse exceptionResponse = ExceptionResponse
+        var exceptionResponse = ExceptionResponse
                 .builder()
                 .status(HttpStatus.NOT_ACCEPTABLE.value())
-                .message(exception.getMessage())
+                .Message(exception.getMessage())
                 .build();
         HttpHeaders headers = new HttpHeaders();
 

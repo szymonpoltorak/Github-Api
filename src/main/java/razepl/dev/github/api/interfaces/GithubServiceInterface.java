@@ -5,5 +5,5 @@ import razepl.dev.github.data.GitRepository;
 import java.util.List;
 
 public interface GithubServiceInterface {
-    List<GitRepository> getUsersRepositories(String username);
+    List<GitRepository> getUsersRepositories(String username, String acceptHeader);
 }
