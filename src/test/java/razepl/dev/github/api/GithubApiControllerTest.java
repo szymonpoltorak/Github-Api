@@ -84,10 +84,11 @@ class GithubApiControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn().getResponse().getContentAsString();
+
         var result = getResultSetLength(response);
 
         // then
-        Assertions.assertEquals(expected, result, "User has some repositories");
+        Assertions.assertEquals(expected, result, "User has " + result + " repositories");
     }
 
     @Test
