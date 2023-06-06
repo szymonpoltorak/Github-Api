@@ -26,7 +26,7 @@ class GithubApiControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private static final String API_MAPPING = String.format("%s%s", GITHUB_API_MAPPING, GET_REPOSITORIES_MAPPING);
+    private static final String API_MAPPING = GITHUB_API_MAPPING + GET_REPOSITORIES_MAPPING;
 
     @Test
     final void test_getUsersRepositories_user_does_not_exist() throws Exception {

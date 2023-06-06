@@ -23,6 +23,8 @@ import static razepl.dev.github.constants.HttpHeaders.ACCEPT_XML;
 public class GithubService implements GithubServiceInterface {
     @Override
     public final List<GitRepository> getUsersRepositories(String username, String acceptHeader) {
+        log.info("Received request to get repositories for user: {}", username);
+
         if (acceptHeader.equals(ACCEPT_XML)) {
             throw new XmlHeaderException("Application/xml header is not supported!");
         }
